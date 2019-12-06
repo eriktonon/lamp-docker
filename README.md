@@ -1,6 +1,6 @@
 # LAMP built with Docker Compose
 
-##Versions 
+## Versions 
 * PHP Version 7.3.12
 * Apache Version 2.4
 * MySQL version 8.0
