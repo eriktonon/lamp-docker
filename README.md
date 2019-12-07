@@ -15,6 +15,7 @@
 ```shell 
 git clone https://github.com/eriktonon/lamp-docker
 cd lamp-docker
+git checkout 5.6
 docker-compose up -d
 ```
 
