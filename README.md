@@ -9,6 +9,11 @@
 * MySQL MySQL database and password settings are inside the .env file
 * Apache2 vhost mapping are within .config / vhosts
 * PHP a php file was left in the index to do some stack testing
+* Virtualhost /var/www/html
+
+## Images docker repository
+* [DockerHub](https://hub.docker.com/u/eriktonon)
+* [Github](https://github.com/eriktonon/docker-images)
 
 ### other versions of php inside the stack
 * [5.6](https://github.com/eriktonon/lamp-docker/tree/5.6)
