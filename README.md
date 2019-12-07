@@ -10,6 +10,13 @@
 * Apache2 vhost mapping are within .config / vhosts
 * PHP a php file was left in the index to do some stack testing
 
+### other versions of php inside the stack
+* [5.6](https://github.com/eriktonon/lamp-docker/tree/5.6)
+* [7.0.33](https://github.com/eriktonon/lamp-docker/tree/7.0.33)
+* [7.1.32](https://github.com/eriktonon/lamp-docker/tree/7.1.32)
+* [7.2.25](https://github.com/eriktonon/lamp-docker/tree/7.2.25)
+* [7.3.12](https://github.com/eriktonon/lamp-docker)
+
 ## Installation
 
 ```shell 
