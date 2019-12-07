@@ -9,8 +9,8 @@ services:
       - "443:443"
     volumes: 
       - ${DOCUMENT_ROOT-./html}:/var/www/html
-      - ${PHP_INI-./.docker/php/php.ini}:/usr/local/etc/php/php.ini
-      - ${VHOSTS_DIR-./.docker/vhosts}:/etc/apache2/sites-enabled
+      - ${PHP_INI-./.config/php/php.ini}:/usr/local/etc/php/php.ini
+      - ${VHOSTS_DIR-./.config/vhosts}:/etc/apache2/sites-enabled
       - ${LOG_DIR-./logs/apache2}:/var/log/apache2
     networks: 
       - lamp-stack
