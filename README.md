@@ -1,7 +1,7 @@
 # LAMP built with Docker Compose
 
 ## Versions 
-* PHP Version 7.3.12
+* PHP Version 7.0.33
 * Apache Version 2.4
 * MySQL version 8.0
 
@@ -15,6 +15,7 @@
 ```shell 
 git clone https://github.com/eriktonon/lamp-docker
 cd lamp-docker
+git checkout 7.0.33
 docker-compose up -d
 ```
 
