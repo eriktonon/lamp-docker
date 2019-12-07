@@ -1,9 +1,9 @@
 # LAMP built with Docker Compose
 
 ## Versions 
-* PHP Version 7.3.12
+* PHP Version 5.6
 * Apache Version 2.4
-* MySQL version 8.0
+* MySQL version 5.7.27
 
 ## Config default  
 * MySQL MySQL database and password settings are inside the .env file

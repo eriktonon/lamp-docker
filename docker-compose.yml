@@ -3,7 +3,7 @@ version: "3"
 services:
   apache2:
     container_name: apache-php
-    image: eriktonon/php:7.3.12
+    image: eriktonon/php:5.6
     ports:
       - "80:80"
       - "443:443"
@@ -16,7 +16,7 @@ services:
       - lamp-stack
   mysql:
     container_name: mysql
-    image: eriktonon/mysql:8.0
+    image: eriktonon/mysql:5.7.27
     ports:
       - "3306:3306"
     volumes: 
