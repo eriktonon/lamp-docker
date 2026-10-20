@@ -1,0 +1,7 @@
+.git
+.github
+data/
+logs/
+*.md
+.env
+.DS_Store

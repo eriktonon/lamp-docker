@@ -1,5 +1,11 @@
-/logs/**
-.idea/**
-.vscode/**
-/data/**
-/html/**
+# Runtime data & logs
+data/
+logs/
+*.log
+
+# OS & Editor artifacts
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

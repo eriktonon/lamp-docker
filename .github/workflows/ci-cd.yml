@@ -1,0 +1,48 @@
+name: CI — Compose Validation & Security Gate
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-and-audit:
+    name: Validate Compose & Security Policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Validate Docker Compose v2 Specification
+        run: |
+          docker compose config -q
+          docker compose --profile tools config -q
+
+      - name: Static AppSec & Hardening Gate (Strix Baseline)
+        run: |
+          grep -q "eriktonon/php:8.4-apache-bookworm" docker-compose.yml
+          grep -q "eriktonon/mysql:8.4-lts" docker-compose.yml
+          grep -q "no-new-privileges:true" docker-compose.yml
+          grep -q "expose_php = Off" .config/php/php.ini
+          grep -q "display_errors = Off" .config/php/php.ini
+          grep -q "ServerTokens Prod" .config/vhosts/default.conf
+          ! grep -rn "phpinfo(" html/
+
+      - name: PHP 8.4 Syntax Verification
+        run: |
+          php -l html/index.php
+          php -l html/health.php

@@ -1,31 +1,122 @@
-version: "3"
+# =============================================================================
+# eriktonon/lamp-docker — Enterprise LAMP Stack (Docker Compose v2)
+# PHP 8.4 Apache Bookworm + MySQL 8.4 LTS + phpMyAdmin 5.2 (Hardened Non-Root)
+# =============================================================================
 
 services:
   apache2:
-    container_name: apache-php
-    image: eriktonon/php:7.3.12
+    container_name: lamp-apache-php84
+    image: eriktonon/php:8.4-apache-bookworm
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
-      - "80:80"
-      - "443:443"
-    volumes: 
-      - ${DOCUMENT_ROOT-./html}:/var/www/html
-      - ${PHP_INI-./.config/php/php.ini}:/usr/local/etc/php/php.ini
-      - ${VHOSTS_DIR-./.config/vhosts}:/etc/apache2/sites-enabled
-      - ${LOG_DIR-./logs/apache2}:/var/log/apache2
-    networks: 
+      - "127.0.0.1:${HTTP_PORT:-8080}:80"
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+      APACHE_DOCUMENT_ROOT: /var/www/html
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ${MYSQL_DATABASE:-app_db}
+      DB_USERNAME: ${MYSQL_USER:-app_user}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-change_me_local_dev}
+    volumes:
+      - ${DOCUMENT_ROOT:-./html}:/var/www/html:ro
+      - ${PHP_INI:-./.config/php/php.ini}:/usr/local/etc/php/conf.d/98-custom.ini:ro
+      - ${VHOSTS_DIR:-./.config/vhosts}:/etc/apache2/sites-enabled:ro
+      - ${LOG_DIR:-./logs/apache2}:/var/log/apache2
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:80/health.php || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        requests:
+          cpus: "0.10"
+          memory: 128M
+        limits:
+          cpus: "0.75"
+          memory: 512M
+    networks:
       - lamp-stack
+
   mysql:
-    container_name: mysql
-    image: eriktonon/mysql:8.0
+    container_name: lamp-mysql84
+    image: eriktonon/mysql:8.4-lts
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
-      - "3306:3306"
-    volumes: 
-      - ${MYSQL_DATA_DIR-./data/mysql}:/var/lib/mysql
-      - ${MYSQL_LOG_DIR-./logs/mysql}:/var/log/mysql
-    env_file: 
+      - "127.0.0.1:${MYSQL_PORT:-3306}:3306"
+    env_file:
       - .env
-    command:  mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --init-connect='SET NAMES UTF8;' --innodb-flush-log-at-trx-commit=0
-    networks: 
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - ${MYSQL_DATA_DIR:-./data/mysql}:/var/lib/mysql
+      - ${MYSQL_LOG_DIR:-./logs/mysql}:/var/log/mysql
+    command:
+      - mysqld
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --innodb-flush-log-at-trx-commit=1
+      - --Max_connections=150
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD --silent || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 25s
+    deploy:
+      resources:
+        requests:
+          cpus: "0.20"
+          memory: 256M
+        limits:
+          cpus: "1.00"
+          memory: 1024M
+    networks:
       - lamp-stack
+
+  phpmyadmin:
+    container_name: lamp-phpmyadmin52
+    image: eriktonon/phpmyadmin:5.2
+    profiles: ["tools"]
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "127.0.0.1:${PMA_PORT:-8081}:80"
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 32M
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:80/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        requests:
+          cpus: "0.05"
+          memory: 64M
+        limits:
+          cpus: "0.50"
+          memory: 256M
+    networks:
+      - lamp-stack
+
 networks:
   lamp-stack:
+    driver: bridge
